@@ -1,0 +1,137 @@
+<html>
+   <head>
+      <title>Homm3 damage calculator</title>
+	  <style>
+		input[type=button] { margin-top: 50px }
+		#result { padding-left: 20px }
+		label { width:280px; display:inline-block; text-align: right; padding-right: 10px }
+		label.detail { padding-left:10px; padding-right: 5px; width:auto; display:inline-block }
+		input[type=radio] { margin: 0 }
+	  </style>
+      <script>
+         function damage(amount, damage, attack, defense, archery, archeryLevel, offense, offenseLevel, attackerLevel, archeryOffenseSpeciality, adelaBless, deffenderLevel, lucky, trait, hate, cavaliers, hexes, armorer, armorerLevel, armorerSpeciality, shield, shieldLevel, airShield, airShieldLevel, forgetfulness, penalty, obstacle, blinded, blindedLevel, immunity, petrified, paralyzed) {
+			var baseDmg = amount * damage
+			var I1 = attack >= defense ? 0.05 * (attack - defense) : 0
+			var R1 = attack < defense ? 0.025 * (defense - attack) : 0
+			var I2 = 0
+			if (archery) {
+				I2 = archeryLevel == 1 ? 0.10 : archeryLevel == 2 ? 0.25 : 0.50
+			} else if (offense) {
+				I2 = offenseLevel == 1 ? 0.10 : offenseLevel == 2 ? 0.20 : 0.30
+			}
+			var I3 = 0
+			if (archeryOffenseSpeciality) {
+				I3 = 0.05 * I2 * attackerLevel
+			} else if (adelaBless) {
+				I3 = 0.03 * (attackerLevel / deffenderLevel)
+			}
+			var I4 = lucky ? 1 : 0
+			var I5 = 0
+			if (trait) {
+				I5 = 1
+			} else if (hate) {
+				I5 = 0.5
+			} else if (cavaliers) {
+				I5 = 0.05 * hexes
+			}
+			var R2 = armorer ? (armorerLevel == 1 ? 0.05 : armorerLevel == 2 ? 0.10 : 0.15) : 0
+			var R3 = armorerSpeciality ? 0.05 * R2 * deffenderLevel : 0
+			var R4 = 0
+			if (shield) {
+				R4 = shieldLevel == 1 ? 0.15 : 0.30
+			} else if (airShield) {
+				R4 = airShieldLevel == 1 ? 0.25 : 0.50
+			} else if (forgetfulness) {
+				R4 = 0.5
+			}
+			var R5 = penalty ? 0.5 : 0
+			var R6 = obstacle ? 0.5 : 0
+			var R7 = blinded ? (blindedLevel == 1 ? 0.5 : 0.75) : 0
+			var R8 = 0
+			if (immunity) {
+				R8 = 0.5
+			} else if (petrified) {
+				R8 = 0.5
+			} else if (paralyzed) {
+				R8 = 0.75
+			}
+			
+			return baseDmg * (1 + I1 + I2 + I3 + I4 + I5) * (1 - R1) * (1 - R2 - R3) * (1 - R4) * (1 - R5) * (1 - R6) * (1 - R7) * (1 - R8)
+         }
+		 
+		 function v(elementName) {
+			var elements = document.getElementsByName(elementName)
+			var firstElement = elements[0]
+			if (firstElement.type == "text") {
+				return parseFloat(firstElement.value)
+			} else if (firstElement.type == "checkbox") {
+				return firstElement.checked
+			} else if (firstElement.type == "radio") {
+				for (var i = 0; i < elements.length; i++) {
+					if (elements[i].checked) return parseInt(elements[i].value)
+				}
+				throw "one radio should be checked"
+			}
+			throw "wrong input type"
+		 }
+		 
+		 function show(value, elementId) {
+			document.getElementById(elementId).innerText = value
+		 }
+      </script>
+      <head>
+   <body>
+      <label for="amount">amount</label><input type="text" name="amount" id="amount" value="1" /><br/>
+	  <label for="damage">damage</label><input type="text" name="damage" id="damage" value="10" /><br/>
+	  <label for="attack">attack</label><input type="text" name="attack" id="attack" value="1" /><br/>
+	  <label for="defense">defense</label><input type="text" name="defense" id="defense" value="1" /><br/>
+	  <label for="attackerLevel">attacker level</label><input type="text" name="attackerLevel" id="attackerLevel" value="1" /><br/>
+	  <label for="deffenderLevel">deffender level</label><input type="text" name="deffenderLevel" id="deffenderLevel" value="1" /><br/>
+	  <label for="archery">archery</label><input type="checkbox" name="archery" id="archery" />
+	  <label for="archeryBasic" class="detail">basic</label><input type="radio" name="archeryLevel" id="archeryBasic" value="1" checked="checked" />
+	  <label for="archeryAdvanced" class="detail">advanced</label><input type="radio" name="archeryLevel" id="archeryAdvanced" value="2" />
+	  <label for="archeryExpert" class="detail">expert</label><input type="radio" name="archeryLevel" id="archeryExpert" value="3" />
+	  <br/>
+	  <label for="offense">offense</label><input type="checkbox" name="offense" id="offense" />
+	  <label for="offenseBasic" class="detail">basic</label><input type="radio" name="offenseLevel" id="offenseBasic" value="1" checked="checked" />
+	  <label for="offenseAdvanced" class="detail">advanced</label><input type="radio" name="offenseLevel" id="offenseAdvanced" value="2" />
+	  <label for="offenseExpert" class="detail">expert</label><input type="radio" name="offenseLevel" id="offenseExpert" value="3" />
+	  <br/>
+      <label for="archeryOffenseSpeciality">archery/offense speciality</label><input type="checkbox" name="archeryOffenseSpeciality" id="archeryOffenseSpeciality" /><br/>
+	  <label for="adelaBless">Adela's bless</label><input type="checkbox" name="adelaBless" id="adelaBless" /><br/>
+	  <label for="lucky">lucky</label><input type="checkbox" name="lucky" id="lucky" /><br/>
+	  <label for="trait">death blow/ballista 2x/opposite elemental</label><input type="checkbox" name="trait" id="trait" /><br/>
+	  <label for="hate">hate</label><input type="checkbox" name="hate" id="hate" /><br/>
+	  <label for="cavaliers">cavaliers/champions</label><input type="checkbox" name="cavaliers" id="cavaliers" />
+	  <label for="hexes" class="detail">traveled hexes</label><input type="text" name="hexes" id="hexes" value="1" />
+	  <br/>
+	  <label for="armorer">armorer</label><input type="checkbox" name="armorer" id="armorer" />
+	  <label for="armorerBasic" class="detail">basic</label><input type="radio" name="armorerLevel" id="armorerBasic" value="1" checked="checked" />
+	  <label for="armorerAdvanced" class="detail">advanced</label><input type="radio" name="armorerLevel" id="armorerAdvanced" value="2" />
+	  <label for="armorerExpert" class="detail">expert</label><input type="radio" name="armorerLevel" id="armorerExpert" value="3" />
+	  <br/>
+	  <label for="armorerSpeciality">armorer speciality</label><input type="checkbox" name="armorerSpeciality" id="armorerSpeciality" /><br/>
+	  <label for="shield">shield</label><input type="checkbox" name="shield" id="shield" />
+	  <label for="shieldBasic" class="detail">basic</label><input type="radio" name="shieldLevel" id="shieldBasic" value="1" checked="checked" />
+	  <label for="shieldAdvanced" class="detail">advanced</label><input type="radio" name="shieldLevel" id="shieldAdvanced" value="2" />
+	  <label for="shieldExpert" class="detail">expert</label><input type="radio" name="shieldLevel" id="shieldExpert" value="3" />
+	  <br/>
+	  <label for="airShield">air shield</label><input type="checkbox" name="airShield" id="airShield" />
+	  <label for="airShieldBasic" class="detail">basic</label><input type="radio" name="airShieldLevel" id="airShieldBasic" value="1" checked="checked" />
+	  <label for="airShieldAdvanced" class="detail">advanced</label><input type="radio" name="airShieldLevel" id="airShieldAdvanced" value="2" />
+	  <label for="airShieldExpert" class="detail">expert</label><input type="radio" name="airShieldLevel" id="airShieldExpert" value="3" />
+	  <br/>
+	  <label for="forgetfulness">basic forgetfulness</label><input type="checkbox" name="forgetfulness" id="forgetfulness" /><br/>
+	  <label for="penalty">range/melee penalty</label><input type="checkbox" name="penalty" id="penalty" /><br/>
+	  <label for="obstacle">obstacle penalty</label><input type="checkbox" name="obstacle" id="obstacle" /><br/>
+	  <label for="blinded">blinded</label><input type="checkbox" name="blinded" id="blinded" />
+	  <label for="blindedBasic" class="detail">basic</label><input type="radio" name="blindedLevel" id="blindedBasic" value="1" checked="checked" />
+	  <label for="blindedAdvanced" class="detail">advanced</label><input type="radio" name="blindedLevel" id="blindedAdvanced" value="2" />
+	  <br/>
+	  <label for="immunity">elementals immunity</label><input type="checkbox" name="immunity" id="immunity" /><br/>
+	  <label for="petrified">petrified</label><input type="checkbox" name="petrified" id="petrified" /><br/>
+	  <label for="paralyzed">paralyzed</label><input type="checkbox" name="paralyzed" id="paralyzed" /><br/>
+      <input type="button" onClick="show(damage(v('amount'), v('damage'), v('attack'), v('defense'), v('archery'), v('archeryLevel'), v('offense'), v('offenseLevel'), v('attackerLevel'), v('archeryOffenseSpeciality'), v('adelaBless'), v('deffenderLevel'), v('lucky'), v('trait'), v('hate'), v('cavaliers'), v('hexes'), v('armorer'), v('armorerLevel'), v('armorerSpeciality'), v('shield'), v('shieldLevel'), v('airShield'), v('airShieldLevel'), v('forgetfulness'), v('penalty'), v('obstacle'), v('blinded'), v('blindedLevel'), v('immunity'), v('petrified'), v('paralyzed')), 'result')" value="calculate" />
+	  <span id="result"></span>
+      <body>
+</html>
